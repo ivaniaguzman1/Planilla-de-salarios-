@@ -1,0 +1,263 @@
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+    <title>Elite Salary SV </title>
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+            background-color: #f4f4f9;
+            color: #333;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            background: #f7f1f0;
+            padding: 35px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            width: 80%;
+            max-width: 1000px;
+            margin: auto;
+        }
+        h1 {
+            color: #B71C1C;
+            font-size: 30px;
+            margin-bottom: 30px;
+            text-transform: uppercase;
+        }
+        table {
+            width: 100%;
+            margin-top: 25px;
+            border-collapse: collapse;
+            background: #fff;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 16px;
+            text-align: center;
+            font-size: 16px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #B71C1C;
+            color: white;
+            font-weight: 600;
+        }
+        td {
+            background-color: #f9f9f9;
+            color: #555;
+        }
+        input {
+            width: 90%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 14px;
+            margin: 10px 0;
+        }
+        .button {
+            padding: 14px 28px;
+            background-color: #B71C1C;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            font-size: 18px;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .button:hover {
+            background-color: white;
+            color: #B71C1C;
+            border: 2px solid #B71C1C;
+        }
+        .table-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 30px;
+        }
+        .table-title {
+            color: #B71C1C;
+            font-weight: 600;
+            font-size: 22px;
+            margin-top: 25px;
+        }
+        .alert {
+            color: red;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Elite Salary SV</h1>
+        <div class="table-container">
+            <p class="table-title">Por favor, registra tus datos en los siguientes campos</p>
+            <table id="salaryTable">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Apellido</th>
+                        <th>Cargo</th>
+                        <th>Salario Base</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" id="nombre" placeholder="" oninput="validarTexto('nombre')"></td>
+                        <td><input type="text" id="apellido" placeholder="" oninput="validarTexto('apellido')"></td>
+                        <td><input type="text" id="cargo" placeholder="Ej. Gerente" oninput="validarTexto('cargo')"></td>
+                        <td><input type="number" id="sueldoBase" placeholder="Ej. 1000" oninput="validarNumero('sueldoBase')"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="button" onclick="calcularSueldo()">Calcular</button>
+            <p id="advertencia" class="alert"></p>
+            <div class="table-container">
+                <p class="table-title">Resultado de los cálculos</p>
+                <table id="resultTable">
+                    <thead>
+                        <tr>
+                            <th>Descuento de ISSS</th>
+                            <th>AFP</th>
+                            <th>Renta Imponible</th>
+                            <th>Impuesto Sobre la Renta</th>
+                            <th>Salario Neto</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span id="resultado-isss">-</span></td>
+                            <td><span id="resultado-afp">-</span></td>
+                            <td><span id="resultado-rentaI">-</span></td>
+                            <td><span id="resultado-isr">-</span></td>
+                            <td><span id="resultado-sueldo-neto">-</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="table-container">
+                <p class="table-title">Aportaciones Patronales</p>
+                <table id="patronalTable">
+                    <thead>
+                        <tr>
+                            <th>ISSS Patronal</th>
+                            <th>AFP Patronal</th>
+                            <th>Total ISSS</th>
+                            <th>Total AFP</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span id="resultado-isssPatronal">-</span></td>
+                            <td><span id="resultado-afpPatronal">-</span></td>
+                            <td><span id="resultado-total-isss">-</span></td>
+                            <td><span id="resultado-total-afp">-</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <button class="button" onclick="limpiarCampos()">Limpiar</button>
+        </div>
+    </div>
+
+    <script>
+        function validarTexto(id) {
+            const input = document.getElementById(id);
+            const regex = /^[a-zA-ZáéíóúÁÉÍÓÚÑñ ]+$/;
+            if (!regex.test(input.value)) {
+                document.getElementById("advertencia").textContent = "¡Advertencia! Solo se permiten letras en los campos de Nombre, Apellido y Cargo.";
+                input.style.border = "2px solid red"; 
+            } else {
+                document.getElementById("advertencia").textContent = "";
+                input.style.border = "1px solid #ccc"; 
+            }
+        }
+
+        function validarNumero(id) {
+            const input = document.getElementById(id);
+            if (input.value < 0) {
+                input.setCustomValidity('El salario base debe ser un número positivo.');
+            } else {
+                input.setCustomValidity('');
+            }
+        }
+
+        function calcularSueldo() {
+            // Verificar que todos los campos estén llenos
+            let nombre = document.getElementById("nombre").value;
+            let apellido = document.getElementById("apellido").value;
+            let cargo = document.getElementById("cargo").value;
+            let sueldoBase = document.getElementById("sueldoBase").value;
+
+            if (!nombre || !apellido || !cargo || !sueldoBase) {
+                document.getElementById("advertencia").textContent = "Por favor, llena todos los campos antes de calcular.";
+                return;
+            } else {
+                document.getElementById("advertencia").textContent = "";
+            }
+
+            let sueldoBaseVal = parseFloat(sueldoBase) || 0;
+            let isss = Math.min(sueldoBaseVal * 0.03, 30);
+            let afp = sueldoBaseVal * 0.0725;
+            let rentaImponible = sueldoBaseVal - isss - afp;
+            let isr = 0;
+
+            if (rentaImponible > 0.00) {
+                if (rentaImponible <= 472.00) {
+                    isr = 0.00; // SIN RETENCIÓN
+                } else if (rentaImponible <= 895.25) {
+                    isr = (rentaImponible - 472.00) * 0.10 + 17.67;
+                } else if (rentaImponible <= 2038.10) {
+                    isr = (rentaImponible - 895.24) * 0.20 + 60.00;
+                } else {
+                    isr = (rentaImponible - 2038.11) * 0.30 + 288.57;
+                }
+            }
+
+            let sueldoNeto = rentaImponible - isr;
+            let isssPatronal = sueldoBaseVal * 0.075;
+            let afpPatronal = sueldoBaseVal * 0.0875;
+            let totalIsss = isss + isssPatronal;
+            let totalAfp = afp + afpPatronal;
+
+            document.getElementById("resultado-isss").textContent = "$" + isss.toFixed(2);
+            document.getElementById("resultado-afp").textContent = "$" + afp.toFixed(2);
+            document.getElementById("resultado-rentaI").textContent = "$" + rentaImponible.toFixed(2);
+            document.getElementById("resultado-isr").textContent = "$" + isr.toFixed(2);
+            document.getElementById("resultado-sueldo-neto").textContent = "$" + sueldoNeto.toFixed(2);
+            document.getElementById("resultado-isssPatronal").textContent = "$" + isssPatronal.toFixed(2);
+            document.getElementById("resultado-afpPatronal").textContent = "$" + afpPatronal.toFixed(2);
+            document.getElementById("resultado-total-isss").textContent = "$" + totalIsss.toFixed(2);
+            document.getElementById("resultado-total-afp").textContent = "$" + totalAfp.toFixed(2);
+        }
+
+        function limpiarCampos() {
+            document.getElementById("nombre").value = '';
+            document.getElementById("apellido").value = '';
+            document.getElementById("cargo").value = '';
+            document.getElementById("sueldoBase").value = '';
+            document.getElementById("advertencia").textContent = '';
+
+            document.getElementById("resultado-isss").textContent = '-';
+            document.getElementById("resultado-afp").textContent = '-';
+            document.getElementById("resultado-rentaI").textContent = '-';
+            document.getElementById("resultado-isr").textContent = '-';
+            document.getElementById("resultado-sueldo-neto").textContent = '-';
+            document.getElementById("resultado-isssPatronal").textContent = '-';
+            document.getElementById("resultado-afpPatronal").textContent = '-';
+            document.getElementById("resultado-total-isss").textContent = '-';
+            document.getElementById("resultado-total-afp").textContent = '-';
+        }
+    </script>
+</body>
+</html>
