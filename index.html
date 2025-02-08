@@ -226,7 +226,7 @@
 
             let sueldoNeto = rentaImponible - isr;
             let isssPatronal = sueldoBaseVal * 0.075;
-            let afpPatronal = sueldoBaseVal * 0.0875;
+            let afpPatronal = sueldoBaseVal > 1000 ? 75 : sueldoBaseVal * 0.0875;
             let totalIsss = isss + isssPatronal;
             let totalAfp = afp + afpPatronal;
 
